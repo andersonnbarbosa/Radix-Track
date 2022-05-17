@@ -1,6 +1,8 @@
-
 from datetime import datetime
 import socket
+import time
+import requests
+
 HOST = ''              # Endereco IP do Servidor
 PORT = 6100            # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,8 +15,12 @@ while True:
     print("Conectado")
     print(cliente)
     while True:
-        msg = con.recv(512)
-        data = str(msg)
+        try:
+            msg = con.recv(1024)
+            data = str(msg)
+            print(data)
+        except:
+            break
         if "BP05" in data:
             con.sendall(str.encode("(027046892428AP05)"))
             print("Resposta enviada")
@@ -29,15 +35,15 @@ while True:
             velocity = data[47:52]
             hour = data[52:58]
             date = data[19:25]
-            print(f'Device ID: {device_number}.')
+            print(f'Device ID: {device_number}')
             if gps_status == "A":
                 state = "valid"
             else: 
                 state = "invalid"
-            print(data)
             con.close()
             break
         if "BP00" in data:
+            time.sleep(1)
             con.sendall(str.encode("(027046892428AP01HSO)"))
             print("Resposta enviada")
             con.close()
@@ -49,8 +55,4 @@ while True:
         print("Mensagem recebida")
         print(" ")
     print("Conexão encerrada")
-    con.close()
-
-   
-            
-                    
+    con.close()                  
