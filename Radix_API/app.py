@@ -2,7 +2,6 @@
 from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
-
 from sqlalchemy import ForeignKey
 
 app = Flask (__name__)
@@ -25,8 +24,8 @@ class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cpf_cnpj = db.Column(db.Integer, unique=True)
     nome = db.Column(db.String(20))
-    veiculo = db.Column(db.Integer, db.ForeignKey('veiculo.id'), nullable=False)
-    endereco = db.Column(db.Integer, db.ForeignKey('endereco.id'), nullable=False)
+    veiculo = db.Column(db.Integer, ForeignKey('veiculo.id'), nullable=False)
+    endereco = db.Column(db.Integer, ForeignKey('endereco.id'), nullable=False)
     def __init__ (self, cpf_cnpj, nome, veiculo, endereco):
         self.cpf_cnpj = cpf_cnpj
         self.nome = nome
@@ -58,7 +57,7 @@ class Veiculo(db.Model):
     placa = db.Column(db.String(10))
     modelo = db.Column(db.String(10))
     fabricante = db.Column(db.String(10))
-    rastreador = db.Column(db.Integer, db.ForeignKey('rastreador.id'), nullable=False)
+    rastreador = db.Column(db.Integer, ForeignKey('rastreador.id'), nullable=False)
     clientes = db.relationship('Cliente', backref='veiculo', lazy=True)
     def __init__ (self, renavam, placa, modelo, fabricante, rastreador):
         self.renavam = renavam
@@ -76,7 +75,7 @@ class Rastreador(db.Model):
     __tablename__ = 'rastreador'
     id = db.Column(db.Integer, primary_key=True)
     imei = db.Column(db.Integer, unique=True)
-    chip = db.Column(db.Integer, db.ForeignKey('chip.id'), nullable=False)
+    chip = db.Column(db.Integer, ForeignKey('chip.id'), nullable=False)
     veiculos = db.relationship('Veiculo', backref='rastreador', lazy=True)
     status = db.relationship('Status', backref='rastreador', lazy=True)
     def __init__ (self, id, imei, chip):
@@ -99,7 +98,7 @@ class Status(db.Model):
     ignicao = db.Column(db.Boolean)
     bloqueio = db.Column(db.Boolean)
     gps = db.Column(db.Boolean)
-    rastreador = db.Column(db.Integer, db.ForeignKey('rastreador.id'), nullable=False)
+    rastreador = db.Column(db.Integer, ForeignKey('rastreador.id'), nullable=False)
     def __init__ (self, latitude, longitude, velocidade, data, hora, ignicao, bloqueio, gps, rastreador):
         self.latitude = latitude
         self.longitude = longitude
@@ -115,8 +114,8 @@ class Chip(db.Model):
     __tablename__ = 'chip'
     id = db.Column(db.Integer, primary_key=True)
     iccid = db.Column(db.Integer, unique=True)
-    linha = db.Column(db.String(10))
-    operadora = db.Column(db.String(10))
+    linha = db.Column(db.String(15))
+    operadora = db.Column(db.String(15))
     rastreadores = db.relationship('Rastreador', backref='chip', lazy=True)
     def __init__ (self, iccid, linha, operadora):
         self.iccid = iccid
@@ -135,19 +134,20 @@ class Usuario(db.Model):
     nome = db.Column(db.Integer)
     login = db.Column(db.String(10))
     senha = db.Column(db.String(10))
-    cliente = db.Column(db.Integer, db.ForeignKey('cliente.id'), nullable=False)
+    cliente = db.Column(db.Integer, ForeignKey('cliente.id'), nullable=False)
     def __init__ (self, nome, login, senha, cliente):
         self.nome = nome
         self.login = login
         self.senha = senha
         self.cliente = cliente
 
-db.create_all()
+##db.create_all()
 
 @app.route('/')
 def index():
     rastreador = Rastreador.query.all()
-    return render_template('index.html', rastreador = rastreador)
+    chip = Chip.query.all()
+    return render_template('index.html', rastreador = rastreador, chip = chip)
 
 @app.route('/novoRastreador', methods=['POST'])
 def novoRastreador():
@@ -162,6 +162,10 @@ def novoRastreador():
             )
             db.session.add(rastreador)
             db.session.commit()
+            print("Adicionado ao Banco de dados")
+        else:
+            return 'Problema na chave'
+    return 'HTTP/1.1', 200
      
 @app.route('/status', methods=['POST'])
 def status():
@@ -182,6 +186,10 @@ def status():
             )
             db.session.add(status)
             db.session.commit()
+            print("Adicionado ao Banco de dados")
+        else:
+            return 'Problema na chave'
+    return 'HTTP/1.1', 200
 
 @app.route('/novoVeiculo', methods=['POST'])
 def novoVeiculo():
@@ -193,10 +201,15 @@ def novoVeiculo():
                 request_data['renavam'],
                 request_data['placa'],
                 request_data['modelo'],
-                request_data['fabricante']
+                request_data['fabricante'],
+                Rastreador.query.get(int(request_data['rastreador']))
             )
             db.session.add(veiculo)
             db.session.commit()
+            print("Adicionado ao Banco de dados")
+        else:
+            return 'Problema na chave'
+    return 'HTTP/1.1', 200
 
 @app.route('/novoChip', methods=['POST'])
 def novoChip():
@@ -205,12 +218,16 @@ def novoChip():
         key = str(request_data['key'])
         if key == str(os.environ.get('KEY_API')):
             chip = Chip(
-                request_data['iccid'],
-                request_data['linha'],
-                request_data['operadora']
+                int(request_data['iccid']),
+                str(request_data['linha']),
+                str(request_data['operadora'])
             )
             db.session.add(chip)
             db.session.commit()
+            print("Adicionado ao Banco de dados")
+        else:
+            return 'Problema na chave'
+    return 'HTTP/1.1', 200
 
 @app.route('/novoUsuario', methods=['POST'])
 def novoUsuario():
@@ -221,10 +238,15 @@ def novoUsuario():
             usuario = Usuario(
                 request_data['nome'],
                 request_data['login'],
-                request_data['senha']
+                request_data['senha'],
+                Cliente.query.get(int(request_data['cliente']))
             )
             db.session.add(usuario)
             db.session.commit()
+            print("Adicionado ao Banco de dados")
+        else:
+            return 'Problema na chave'
+    return 'HTTP/1.1', 200
 
 @app.route('/novoCliente', methods=['POST'])
 def novoCliente():
@@ -240,6 +262,10 @@ def novoCliente():
             )
             db.session.add(cliente)
             db.session.commit()
+            print("Adicionado ao Banco de dados")
+        else:
+            return 'Problema na chave'
+    return 'HTTP/1.1', 200
 
 @app.route('/novoEndereco', methods=['POST'])
 def novoEndereco():
@@ -255,6 +281,10 @@ def novoEndereco():
             )
             db.session.add(endereco)
             db.session.commit()
+            print("Adicionado ao Banco de dados")
+        else:
+            return 'Problema na chave'
+    return 'HTTP/1.1', 200
 
 if __name__ == '__main__':
     app.run()

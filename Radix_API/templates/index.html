@@ -25,6 +25,22 @@
                 {%endfor%}
               </tbody>
             </table>
+            <table class="table table-strapped">
+              <thead>
+                <th>IMEI</th>
+                <th>LINHA</th>
+                <th>OPERADORA</th>
+              </thead>
+              <tbody>
+                {%for c in chip%}
+                <tr>
+                 <td>{{c.imei}}</td>
+                 <td>{{c.linha}}</td>
+                 <td>{{c.operadora}}</td>
+                </tr>
+                {%endfor%}
+              </tbody>
+            </table>
         </div>
     </body>
 </html>

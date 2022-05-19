@@ -1,7 +1,6 @@
 from datetime import datetime
 import socket
 import time
-import requests
 
 HOST = ''              # Endereco IP do Servidor
 PORT = 6100            # Porta que o Servidor esta
