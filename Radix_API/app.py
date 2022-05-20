@@ -112,7 +112,7 @@ class Status(db.Model):
 
 class Chip(db.Model):
     __tablename__ = 'chip'
-    id = db.Column(BIGINT, primary_key=True)
+    id = db.Column(BIGINT, unsigned=False, primary_key=True)
     iccid = db.Column(db.String(15), unique=True)
     linha = db.Column(db.String(15))
     operadora = db.Column(db.String(15))
