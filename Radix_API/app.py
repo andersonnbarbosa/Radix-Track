@@ -2,7 +2,6 @@
 from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
-from sqlalchemy import ForeignKey
 
 app = Flask (__name__)
 
@@ -24,8 +23,9 @@ class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cpf_cnpj = db.Column(db.Integer, unique=True)
     nome = db.Column(db.String(20))
-    veiculo = db.Column(db.Integer, ForeignKey('veiculo.id'), nullable=False)
-    endereco = db.Column(db.Integer, ForeignKey('endereco.id'), nullable=False)
+    endereco = db.relationship('Endereco', backref='cliente', uselist=False)
+    veiculo = db.relationship('Veiculo', backref='cliente')
+    usuario = db.relationship('usuario', backref='cliente')
     def __init__ (self, cpf_cnpj, nome, veiculo, endereco):
         self.cpf_cnpj = cpf_cnpj
         self.nome = nome
@@ -43,7 +43,7 @@ class Endereco(db.Model):
     logradouro = db.Column(db.String(20))
     bairro = db.Column(db.String(20))
     estado = db.Column(db.String(20))
-    clientes = db.relationship('Cliente', backref='endereco', lazy=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'))
     def __init__ (self, cep, logradouro, bairro, estado):
         self.cep = cep
         self.logradouro = logradouro
@@ -57,13 +57,14 @@ class Veiculo(db.Model):
     placa = db.Column(db.String(10))
     modelo = db.Column(db.String(10))
     fabricante = db.Column(db.String(10))
-    rastreador = db.Column(db.Integer, ForeignKey('rastreador.id'), nullable=False)
-    clientes = db.relationship('Cliente', backref='veiculo', lazy=True)
-    def __init__ (self, renavam, placa, modelo, fabricante, rastreador):
+    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'))
+    rastreador_id = db.Column(db.Integer, db.ForeignKey('rastreador.id'))
+    def __init__ (self, renavam, placa, modelo, fabricante, cliente_id, rastreador):
         self.renavam = renavam
         self.placa = placa
         self.modelo = modelo
         self.fabricante = fabricante
+        self.cliente_id = cliente_id
         self.rastreador = rastreador
     def as_dict(self):
         return{
@@ -75,9 +76,8 @@ class Rastreador(db.Model):
     __tablename__ = 'rastreador'
     id = db.Column(db.Integer, primary_key=True)
     imei = db.Column(db.Integer, unique=True)
-    chip = db.Column(db.Integer, ForeignKey('chip.id'), nullable=False)
-    veiculos = db.relationship('Veiculo', backref='rastreador', lazy=True)
-    status = db.relationship('Status', backref='rastreador', lazy=True)
+    chip = db.Column(db.Integer, db.ForeignKey('chip.id'), nullable=False)
+    veiculo = db.relationship('Veiculo', backref='rastreador', uselist=False)
     def __init__ (self, id, imei, chip):
         self.id = id
         self.imei = imei
@@ -98,7 +98,7 @@ class Status(db.Model):
     ignicao = db.Column(db.Boolean)
     bloqueio = db.Column(db.Boolean)
     gps = db.Column(db.Boolean)
-    rastreador = db.Column(db.Integer, ForeignKey('rastreador.id'), nullable=False)
+    rastreador = db.Column(db.Integer, db.ForeignKey('rastreador.id'), nullable=False)
     def __init__ (self, latitude, longitude, velocidade, data, hora, ignicao, bloqueio, gps, rastreador):
         self.latitude = latitude
         self.longitude = longitude
@@ -116,7 +116,7 @@ class Chip(db.Model):
     iccid = db.Column(db.Integer, unique=True)
     linha = db.Column(db.String(15))
     operadora = db.Column(db.String(15))
-    rastreadores = db.relationship('Rastreador', backref='chip', lazy=True)
+    rastreadores = db.relationship('Rastreador', backref='chip', uselist=True)
     def __init__ (self, iccid, linha, operadora):
         self.iccid = iccid
         self.linha = linha
@@ -134,14 +134,14 @@ class Usuario(db.Model):
     nome = db.Column(db.Integer)
     login = db.Column(db.String(10))
     senha = db.Column(db.String(10))
-    cliente = db.Column(db.Integer, ForeignKey('cliente.id'), nullable=False)
+    cliente = db.Column(db.Integer, db.ForeignKey('cliente.id'), nullable=False)
     def __init__ (self, nome, login, senha, cliente):
         self.nome = nome
         self.login = login
         self.senha = senha
         self.cliente = cliente
 
-##db.create_all()
+db.create_all()
 
 @app.route('/')
 def index():
@@ -202,6 +202,7 @@ def novoVeiculo():
                 request_data['placa'],
                 request_data['modelo'],
                 request_data['fabricante'],
+                request_data['cliente'],
                 Rastreador.query.get(int(request_data['rastreador']))
             )
             db.session.add(veiculo)
