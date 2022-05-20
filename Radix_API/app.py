@@ -2,7 +2,7 @@
 from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
-
+from sqlalchemy.dialects.mysql import BIGINT
 app = Flask (__name__)
 
 ENV = 'prod'
@@ -21,16 +21,15 @@ db = SQLAlchemy(app)
 class Cliente(db.Model):
     __tablename__ = 'cliente'
     id = db.Column(db.Integer, primary_key=True)
-    cpf_cnpj = db.Column(db.Integer, unique=True)
+    cpf_cnpj = db.Column(db.String(10), unique=True)
     nome = db.Column(db.String(20))
     endereco = db.relationship('Endereco', backref='cliente', uselist=False)
     veiculo = db.relationship('Veiculo', backref='cliente')
-    usuario = db.relationship('usuario', backref='cliente')
-    def __init__ (self, cpf_cnpj, nome, veiculo, endereco):
+    usuario = db.relationship('Usuario', backref='cliente', uselist=False)
+    def __init__ (self, cpf_cnpj, nome, veiculo):
         self.cpf_cnpj = cpf_cnpj
         self.nome = nome
         self.veiculo = veiculo
-        self.endereco = endereco
     def as_dict(self):
         return {
             "id": self.id,
@@ -39,16 +38,17 @@ class Cliente(db.Model):
 class Endereco(db.Model):
     __tablename__ = 'endereco'
     id = db.Column(db.Integer, primary_key=True)
-    cep = db.Column(db.Integer)
+    cep = db.Column(db.String(10))
     logradouro = db.Column(db.String(20))
     bairro = db.Column(db.String(20))
     estado = db.Column(db.String(20))
     cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'))
-    def __init__ (self, cep, logradouro, bairro, estado):
+    def __init__ (self, cep, logradouro, bairro, estado, cliente_id):
         self.cep = cep
         self.logradouro = logradouro
         self.bairro = bairro
         self.estado = estado
+        self.cliente_id = cliente_id
 
 class Veiculo(db.Model):
     __tablename__ = 'veiculo'
@@ -75,13 +75,13 @@ class Veiculo(db.Model):
 class Rastreador(db.Model):
     __tablename__ = 'rastreador'
     id = db.Column(db.Integer, primary_key=True)
-    imei = db.Column(db.Integer, unique=True)
-    chip = db.Column(db.Integer, db.ForeignKey('chip.id'), nullable=False)
+    imei = db.Column(db.String(15), unique=True)
+    chip_id = db.Column(db.Integer, db.ForeignKey('chip.id'), nullable=False)
     veiculo = db.relationship('Veiculo', backref='rastreador', uselist=False)
-    def __init__ (self, id, imei, chip):
+    def __init__ (self, id, imei, chip_id):
         self.id = id
         self.imei = imei
-        self.chip = chip
+        self.chip_id = chip_id
     def as_dict(self):
         return{
             "id": self.id
@@ -98,8 +98,8 @@ class Status(db.Model):
     ignicao = db.Column(db.Boolean)
     bloqueio = db.Column(db.Boolean)
     gps = db.Column(db.Boolean)
-    rastreador = db.Column(db.Integer, db.ForeignKey('rastreador.id'), nullable=False)
-    def __init__ (self, latitude, longitude, velocidade, data, hora, ignicao, bloqueio, gps, rastreador):
+    rastreador_id = db.Column(db.Integer, db.ForeignKey('rastreador.id'), nullable=False)
+    def __init__ (self, latitude, longitude, velocidade, data, hora, ignicao, bloqueio, gps, rastreador_id):
         self.latitude = latitude
         self.longitude = longitude
         self.velocidade = velocidade
@@ -108,12 +108,12 @@ class Status(db.Model):
         self.ignicao = ignicao
         self.bloqueio = bloqueio
         self.gps = gps
-        self.rastreador = rastreador
+        self.rastreador_id = rastreador_id
 
 class Chip(db.Model):
     __tablename__ = 'chip'
-    id = db.Column(db.Integer, primary_key=True)
-    iccid = db.Column(db.Integer, unique=True)
+    id = db.Column(BIGINT, primary_key=True)
+    iccid = db.Column(db.String(15), unique=True)
     linha = db.Column(db.String(15))
     operadora = db.Column(db.String(15))
     rastreadores = db.relationship('Rastreador', backref='chip', uselist=True)
@@ -131,15 +131,15 @@ class Chip(db.Model):
 class Usuario(db.Model):
     __tablename__ = 'usuario'
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.Integer)
+    nome = db.Column(db.String(10))
     login = db.Column(db.String(10))
     senha = db.Column(db.String(10))
-    cliente = db.Column(db.Integer, db.ForeignKey('cliente.id'), nullable=False)
-    def __init__ (self, nome, login, senha, cliente):
+    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'), nullable=False)
+    def __init__ (self, nome, login, senha, cliente_id):
         self.nome = nome
         self.login = login
         self.senha = senha
-        self.cliente = cliente
+        self.cliente_id = cliente_id
 
 db.create_all()
 
@@ -158,7 +158,7 @@ def novoRastreador():
             rastreador  = Rastreador(
                 request_data['id'],
                 request_data['imei'],
-                Chip.query.get(int(request_data['chip']))
+                Chip.query.filter_by(iccid = int(request_data['chip'])).first().id
             )
             db.session.add(rastreador)
             db.session.commit()
@@ -203,7 +203,7 @@ def novoVeiculo():
                 request_data['modelo'],
                 request_data['fabricante'],
                 request_data['cliente'],
-                Rastreador.query.get(int(request_data['rastreador']))
+                Rastreador.query.filter_by(imei = int(request_data['rastreador'])).id
             )
             db.session.add(veiculo)
             db.session.commit()
@@ -240,7 +240,7 @@ def novoUsuario():
                 request_data['nome'],
                 request_data['login'],
                 request_data['senha'],
-                Cliente.query.get(int(request_data['cliente']))
+                Cliente.query.filter_by(nome = request_data['cliente']).id
             )
             db.session.add(usuario)
             db.session.commit()
@@ -258,8 +258,7 @@ def novoCliente():
             cliente = Cliente(
                 request_data['cpf_cnpj'],
                 request_data['nome'],
-                Veiculo.query.get(int(request_data['veiculo'])),
-                Endereco.query.get(int(request_data['endereco']))
+                Veiculo.query.filter_by(placa = request_data['veiculo']).id
             )
             db.session.add(cliente)
             db.session.commit()
@@ -278,7 +277,8 @@ def novoEndereco():
                 request_data['cep'],
                 request_data['logradouro'],
                 request_data['bairro'],
-                request_data['estado']
+                request_data['estado'],
+                Cliente.query.filter_by(nome = request_data['cliente']).id
             )
             db.session.add(endereco)
             db.session.commit()
