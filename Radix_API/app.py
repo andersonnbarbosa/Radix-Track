@@ -1,8 +1,7 @@
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, json
 from flask_sqlalchemy import SQLAlchemy
 import os
-from sqlalchemy.dialects.mysql import BIGINT
 app = Flask (__name__)
 
 ENV = 'prod'
@@ -18,18 +17,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+#####################################################################################
+                         ## MODELAGEM DO BANCO DE DADOS ##
+#####################################################################################
+
 class Cliente(db.Model):
     __tablename__ = 'cliente'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, unique=True, primary_key=True)
     cpf_cnpj = db.Column(db.String(10), unique=True)
     nome = db.Column(db.String(20))
     endereco = db.relationship('Endereco', backref='cliente', uselist=False)
-    veiculo = db.relationship('Veiculo', backref='cliente')
+    veiculo = db.relationship('Veiculo', backref='cliente', uselist=False)
     usuario = db.relationship('Usuario', backref='cliente', uselist=False)
-    def __init__ (self, cpf_cnpj, nome, veiculo):
+    def __init__ (self, cpf_cnpj, nome):
         self.cpf_cnpj = cpf_cnpj
         self.nome = nome
-        self.veiculo = veiculo
     def as_dict(self):
         return {
             "id": self.id,
@@ -59,13 +61,13 @@ class Veiculo(db.Model):
     fabricante = db.Column(db.String(10))
     cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'))
     rastreador_id = db.Column(db.Integer, db.ForeignKey('rastreador.id'))
-    def __init__ (self, renavam, placa, modelo, fabricante, cliente_id, rastreador):
+    def __init__ (self, renavam, placa, modelo, fabricante, cliente_id, rastreador_id):
         self.renavam = renavam
         self.placa = placa
         self.modelo = modelo
         self.fabricante = fabricante
         self.cliente_id = cliente_id
-        self.rastreador = rastreador
+        self.rastreador_id = rastreador_id
     def as_dict(self):
         return{
             "id": self.id,
@@ -75,16 +77,17 @@ class Veiculo(db.Model):
 class Rastreador(db.Model):
     __tablename__ = 'rastreador'
     id = db.Column(db.Integer, primary_key=True)
+    id_track = db.Column(db.String(20))
     imei = db.Column(db.String(15), unique=True)
     chip_id = db.Column(db.Integer, db.ForeignKey('chip.id'), nullable=False)
     veiculo = db.relationship('Veiculo', backref='rastreador', uselist=False)
-    def __init__ (self, id, imei, chip_id):
-        self.id = id
+    def __init__ (self, id_track, imei, chip_id):
+        self.id_track = id_track
         self.imei = imei
         self.chip_id = chip_id
     def as_dict(self):
         return{
-            "id": self.id
+            "id": self.id_track
         }
 
 class Status(db.Model):
@@ -109,10 +112,23 @@ class Status(db.Model):
         self.bloqueio = bloqueio
         self.gps = gps
         self.rastreador_id = rastreador_id
+    def as_dict(self):
+        return{
+            "id": self.id,
+            "latitude": str(self.latitude),
+            "longitude": str(self.longitude),
+            "velocidade": str(self.velocidade),
+            "data": str(self.data),
+            "hora": str(self.hora),
+            "ignicao": str(self.ignicao),
+            "bloqueio": str(self.bloqueio),
+            "gps": str(self.gps),
+            "rastreador": str(self.rastreador)
+        }
 
 class Chip(db.Model):
     __tablename__ = 'chip'
-    id = db.Column(BIGINT, unsigned=False, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     iccid = db.Column(db.String(15), unique=True)
     linha = db.Column(db.String(15))
     operadora = db.Column(db.String(15))
@@ -141,6 +157,11 @@ class Usuario(db.Model):
         self.senha = senha
         self.cliente_id = cliente_id
 
+#####################################################################################
+                              ## APLICAÇÃO WEB FLASK ##
+#####################################################################################
+
+##### Rotas Cadastro/novo
 db.create_all()
 
 @app.route('/')
@@ -158,7 +179,7 @@ def novoRastreador():
             rastreador  = Rastreador(
                 request_data['id'],
                 request_data['imei'],
-                Chip.query.filter_by(iccid = int(request_data['chip'])).first().id
+                Chip.query.filter_by(iccid = str(request_data['chip'])).first().id
             )
             db.session.add(rastreador)
             db.session.commit()
@@ -202,8 +223,8 @@ def novoVeiculo():
                 request_data['placa'],
                 request_data['modelo'],
                 request_data['fabricante'],
-                request_data['cliente'],
-                Rastreador.query.filter_by(imei = int(request_data['rastreador'])).id
+                Cliente.query.filter_by(nome = str(request_data['cliente'])).first().id,
+                Rastreador.query.filter_by(imei = str(request_data['rastreador'])).first().id
             )
             db.session.add(veiculo)
             db.session.commit()
@@ -240,7 +261,7 @@ def novoUsuario():
                 request_data['nome'],
                 request_data['login'],
                 request_data['senha'],
-                Cliente.query.filter_by(nome = request_data['cliente']).id
+                Cliente.query.filter_by(nome = request_data['cliente']).first().id
             )
             db.session.add(usuario)
             db.session.commit()
@@ -257,8 +278,7 @@ def novoCliente():
         if key == str(os.environ.get('KEY_API')):
             cliente = Cliente(
                 request_data['cpf_cnpj'],
-                request_data['nome'],
-                Veiculo.query.filter_by(placa = request_data['veiculo']).id
+                request_data['nome']
             )
             db.session.add(cliente)
             db.session.commit()
@@ -278,7 +298,7 @@ def novoEndereco():
                 request_data['logradouro'],
                 request_data['bairro'],
                 request_data['estado'],
-                Cliente.query.filter_by(nome = request_data['cliente']).id
+                Cliente.query.filter_by(nome = request_data['cliente']).first().id
             )
             db.session.add(endereco)
             db.session.commit()
@@ -286,6 +306,57 @@ def novoEndereco():
         else:
             return 'Problema na chave'
     return 'HTTP/1.1', 200
+
+### Rotas autocomplete
+@app.route('/autocompleteRastreador', methods=['POST'])
+def autocompleteRastreador():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        key = str(request_data['key'])
+        rastreadores = Rastreador.query.all()
+        list = [r.as_dict() for r in rastreadores]
+        if key == str(os.environ.get('KEY_API')):
+            return json.dumps(list)
+
+@app.route('/autocompleteVeiculo', methods=['POST'])
+def autocompleteVeiculo():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        key = str(request_data['key'])
+        veiculo = Veiculo.query.all()
+        list = [r.as_dict() for r in veiculo]
+        if key == str(os.environ.get('KEY_API')):
+           return json.dumps(list)
+
+@app.route('/autocompleteChip', methods=['POST'])
+def autocompleteChip():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        key = str(request_data['key'])
+        chip = Chip.query.all()
+        list = [r.as_dict() for r in chip]
+        if key == str(os.environ.get('KEY_API')):
+            return json.dumps(list)
+
+@app.route('/autocompleteUsuario', methods=['POST'])
+def autocompleteUsuario():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        key = str(request_data['key'])
+        usuario = Usuario.query.all()
+        list = [r.as_dict() for r in usuario]
+        if key == str(os.environ.get('KEY_API')):
+            return json.dumps(list)
+
+@app.route('/autocompleteCliente', methods=['POST'])
+def autocompleteCliente():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        key = str(request_data['key'])
+        cliente = Cliente.query.all()
+        list = [r.as_dict() for r in cliente]
+        if key == str(os.environ.get('KEY_API')):
+            return json.dumps(list)
 
 if __name__ == '__main__':
     app.run()
