@@ -1,0 +1,68 @@
+* {
+    margin: 0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+.leaflet-container {
+    width: 955px;
+    height: 650px;
+    z-index: 0;
+}
+
+.container-main{
+    border-radius: 10px;
+}
+
+.container-logo{
+    width: 100px;
+    height: 100px;
+    z-index: 1;
+    position: fixed;
+    background: rgba(230, 230, 230, 0.8);
+    border-radius: 20px;
+    margin: 50px;
+}
+
+.logo-radix img{
+    width: 100px;
+    height: 100px;
+}
+
+.container-opcoes{
+    padding-top: 10px;
+    position: fixed;
+    width: auto;
+    z-index: 1;
+    height: 100px;
+    left: 312px;
+    top: 55px;
+    
+    background: rgba(230, 230, 230, 0.8);
+    border-radius: 20px;
+}
+
+.container-opcoes img{
+    margin: 15px;
+    width: 50px;
+    height: 50px;
+}
+
+.container-filter{
+    padding-top: 10px;
+    position: fixed;
+    width: auto;
+    z-index: 1;
+    height: 100px;
+    left: 800px;
+    top: 60px;
+
+    background: rgba(230, 230, 230, 0.8);
+    border-radius: 20px;
+}
+
+.container-filter img{
+    margin: 15px;
+    width: 50px;
+    height: 50px;
+}
