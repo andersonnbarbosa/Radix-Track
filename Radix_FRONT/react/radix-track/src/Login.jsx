@@ -6,7 +6,7 @@ export default function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     return (
-        < div className="container" >
+        < div className="container-flex" >
             <div className="container-login">
                 <div className="wrap-login">
                     <form action="" className="login-form">
