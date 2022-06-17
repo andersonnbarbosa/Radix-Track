@@ -65,6 +65,6 @@ export default function Home() {
                     </MapContainer>
                 </div>
             </div>
-        </div>
+        </div>                       
     )
 }
