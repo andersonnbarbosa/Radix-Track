@@ -1,13 +1,3 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-.container {
-    width: 100%;
-    margin: 0 auto;
-}
 
 .container-login {
     width: 100%;
@@ -18,7 +8,8 @@
     align-items: center;
     justify-content: center;
 
-    padding: 15px;
+    padding: 5%;
+    margin: 0%;
 
     background: -webkit-linear-gradient(to bottom, #fff, #000);
     background: -o-linear-gradient(to bottom, #fff, #000);
