@@ -93,11 +93,11 @@ class Rastreador(db.Model):
 class Status(db.Model):
     __tablename__ = 'status'
     id = db.Column(db.Integer, primary_key=True)
-    latitude = db.Column(db.String(10))
-    longitude = db.Column(db.String(10))
+    latitude = db.Column(db.String(15))
+    longitude = db.Column(db.String(15))
     velocidade = db.Column(db.Float)
-    data = db.Column(db.String(10))
-    hora = db.Column(db.String(10))
+    data = db.Column(db.String(15))
+    hora = db.Column(db.String(15))
     ignicao = db.Column(db.Boolean)
     bloqueio = db.Column(db.Boolean)
     gps = db.Column(db.Boolean)
@@ -123,7 +123,7 @@ class Status(db.Model):
             "ignicao": str(self.ignicao),
             "bloqueio": str(self.bloqueio),
             "gps": str(self.gps),
-            "rastreador": str(self.rastreador)
+            "rastreador": str(self.rastreador_id)
         }
 
 class Chip(db.Model):
@@ -357,6 +357,20 @@ def autocompleteCliente():
         list = [r.as_dict() for r in cliente]
         if key == str(os.environ.get('KEY_API')):
             return json.dumps(list)
+
+@app.route('/statusRastreador', methods=['POST'])
+def statusRastreador():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        key = str(request_data['key'])
+        if key == str(os.environ.get('KEY_API')):
+            status = Status.query.filter_by(rastreador_id = request_data['rastreador']).all()
+            counter = 0
+            for i in status:
+                counter += 1
+            s = Status.query.get(counter)
+            res = status.as_dict()
+            return json.dumps(res)
 
 if __name__ == '__main__':
     app.run()
