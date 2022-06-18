@@ -1,14 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './Rastreador.css'
-import rastreador from './assets/rastreadores.png'
+import './styles/Veiculo.css'
+import veiculo from '../assets/veiculos.png'
 
-export default function Rastreador() {
+export default function Veiculo() {
     return (
         <div className="container-fluid main">
             <div className="container">
-                <div className="container-rastreador">
-                    <h1>Cadastro de Rastreadores</h1>
+                <div className="container-veiculo">
+                    <h1>Cadastro de Veiculos</h1>
                     <form action="" className="form-group">
                         <div className="row">
                             <div className="col-4 container-input">
@@ -29,7 +29,7 @@ export default function Rastreador() {
                             </div>
                             <div className="col-4">
                                 <div className="container-logo justify-content-center">
-                                    <img src={rastreador} alt="Rastreador" className="rastreador-logo" />
+                                    <img src={veiculo} alt="Veiculo" className="veiculo-logo" />
                                 </div>
                                 <div className="container-button">
                                     <button className='btn btn-success'>Salvar</button>

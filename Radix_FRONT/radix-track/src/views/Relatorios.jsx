@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect} from 'react'
 import { Link } from 'react-router-dom'
-import './Relatorios.css'
-import relatorio from './assets/relatorios.png'
-
+import './styles/Relatorios.css'
+import relatorio from '../assets/relatorios.png'
 
 export default function Relatorio() {
 
@@ -15,7 +14,6 @@ export default function Relatorio() {
                         <div className="row">
                             <div className="col-8">
                                 <table class="table">
-    
                                 </table>
                                     </div>
                                     <div className="col-4">

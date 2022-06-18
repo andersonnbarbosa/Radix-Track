@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './Cliente.css'
-import cliente from './assets/cliente.png'
+import './styles/Cliente.css'
+import cliente from '../assets/cliente.png'
 
 export default function Home() {
     return (

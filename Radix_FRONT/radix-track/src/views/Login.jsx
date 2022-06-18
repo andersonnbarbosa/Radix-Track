@@ -1,6 +1,6 @@
 import "./Login.css"
 import React, { useState }from 'react'
-import radix from './assets/radix.png'
+import radix from '../assets/radix.png'
 
 export default function Login() {
     const [email, setEmail] = useState("")

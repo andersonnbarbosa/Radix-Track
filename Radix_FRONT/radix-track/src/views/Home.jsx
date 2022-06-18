@@ -1,13 +1,13 @@
 import React from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
 import { Link } from 'react-router-dom'
-import './Home.css'
-import radix from './assets/radix.png'
-import relatorios from './assets/relatorios.png'
-import rastreadores from './assets/rastreadores.png'
-import veiculos from './assets/veiculos.png'
-import cliente from './assets/cliente.png'
-import filtro from './assets/filtro.png'
+import './styles/Home.css'
+import radix from '../assets/radix.png'
+import relatorios from '../assets/relatorios.png'
+import rastreadores from '../assets/rastreadores.png'
+import veiculos from '../assets/veiculos.png'
+import cliente from '../assets/cliente.png'
+import filtro from '../assets/filtro.png'
 
 export default function Home() {
     return (
