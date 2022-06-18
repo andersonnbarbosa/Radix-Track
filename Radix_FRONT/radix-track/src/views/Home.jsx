@@ -1,5 +1,5 @@
-import React from 'react'
-import { MapContainer, TileLayer } from 'react-leaflet'
+import React, { useState, useEffect } from 'react'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 import './styles/Home.css'
 import radix from '../assets/radix.png'
@@ -8,8 +8,30 @@ import rastreadores from '../assets/rastreadores.png'
 import veiculos from '../assets/veiculos.png'
 import cliente from '../assets/cliente.png'
 import filtro from '../assets/filtro.png'
+import Veiculo from './Veiculo';
 
 export default function Home() {
+
+    const [trackInfo, setTrackinfo] = useState([]);
+    const [isLoading, setLoading] = useState(true);
+
+    function queryData() {
+        setLoading(true)
+        fetch('http://localhost:3001/statusRastreador')
+            .then(response => response.json())
+            .then(data => {
+                setTrackinfo(data);
+                setLoading(false)
+            });
+    }
+    useEffect(() => {
+        queryData();
+    }, [])
+
+    if (isLoading) {
+        return (<p>Loading...</p>)
+    }
+
     return (
         <div className="container-fluid">
             <div className="row container-row justify-content-around w-auto p-3 bg-transparent">
@@ -57,14 +79,25 @@ export default function Home() {
                     </div>
                 </div>
                 <div id="map" className='container'>
-                    <MapContainer center={[-12.245056, -38.9458136]} zoom={6}>
+                    <MapContainer center={[-12.245056, -38.9458136]} zoom={15}>
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
+                        <Marker position={[trackInfo.latitude, trackInfo.longitude]}>
+                            <Popup>
+                                <div>
+                                    <span>
+                                        Ultima comunicação: {trackInfo.hora}
+                                        <br/>
+                                        Velocidade: {trackInfo.velocidade}
+                                    </span>
+                                </div>
+                            </Popup>
+                        </Marker>
                     </MapContainer>
                 </div>
             </div>
-        </div>                       
+        </div>
     )
 }
