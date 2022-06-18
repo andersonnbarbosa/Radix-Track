@@ -13,14 +13,19 @@
     background: linear-gradient(to bottom, #fff, #000);
 }
 .container-relatorio {
-    top: 20vh;
+    top: 10vh;
     width: 80vw;
-    height: 60vh;
+    height: 80vh;
     border-radius: 20px;
     background: #dadada;
     position: relative;
     padding: 20px;
     z-index: 1;
+}
+
+.leaflet-container{
+    height: 55vh;
+    margin-bottom: 5px;
 }
 
 .container-logo img {
@@ -46,5 +51,5 @@
 
 
 .container-button button {
-    margin: 10px;
+    margin: 15px;
 }

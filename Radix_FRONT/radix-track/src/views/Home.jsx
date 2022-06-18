@@ -8,7 +8,6 @@ import rastreadores from '../assets/rastreadores.png'
 import veiculos from '../assets/veiculos.png'
 import cliente from '../assets/cliente.png'
 import filtro from '../assets/filtro.png'
-import Veiculo from './Veiculo';
 
 export default function Home() {
 
@@ -78,7 +77,7 @@ export default function Home() {
                         </span>
                     </div>
                 </div>
-                <div id="map" className='container'>
+                <div className='container'>
                     <MapContainer center={[-12.245056, -38.9458136]} zoom={15}>
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
