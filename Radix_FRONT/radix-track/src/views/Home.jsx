@@ -77,24 +77,44 @@ export default function Home() {
                         </span>
                     </div>
                 </div>
-                <div className='container'>
-                    <MapContainer center={[-12.245056, -38.9458136]} zoom={15}>
-                        <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        <Marker position={[trackInfo.latitude, trackInfo.longitude]}>
-                            <Popup>
-                                <div>
-                                    <span>
-                                        Ultima comunicação: {trackInfo.hora}
-                                        <br/>
-                                        Velocidade: {trackInfo.velocidade}
-                                    </span>
-                                </div>
-                            </Popup>
-                        </Marker>
-                    </MapContainer>
+                <div className="row">
+                    <div className="col">
+                        <div id="container-map" className='container-flex'>
+                            <MapContainer center={[-12.245056, -38.9458136]} zoom={15}>
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                <Marker position={[trackInfo.latitude, trackInfo.longitude]}>
+                                    <Popup>
+                                        <div class="card popup-card">
+                                            <div class="card-header">
+                                                {trackInfo.placa} - {trackInfo.rastreador}
+                                            </div>
+                                            <div class="card-body">
+                                                <table className="table table-striped">
+                                                    <thead>
+                                                        <th>Velocidade</th>
+                                                        <th>Ult. comunicação</th>
+                                                        <th>GPS status</th>
+                                                        <th>Ignição</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>{trackInfo.velocidade}Km</td>
+                                                            <td>{trackInfo.hora} {trackInfo.data}</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                            </MapContainer>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

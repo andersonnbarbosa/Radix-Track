@@ -23,6 +23,13 @@
     z-index: 1;
 }
 
+.container-input input{
+    background-color: transparent;
+    border-radius: 5px;
+    border-color: #000;
+    font-size: 13px;
+}
+
 .container-logo img {
     margin: 0px;
     width: 200px;

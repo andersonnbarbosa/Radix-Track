@@ -3,6 +3,13 @@
     margin:0;
   }
 
+.container-map{
+    padding: 0px;
+    margin:0px;
+    width: 35vw;
+    height: 55vh
+}
+
 .main {
     width: 100vw;
     height: 100vh;
@@ -23,10 +30,12 @@
     z-index: 1;
 }
 
-.leaflet-container{
-    height: 55vh;
-    margin-bottom: 5px;
+.container-table{
+    padding: 0px;
+    height: 56vh;
+    overflow: scroll;
 }
+
 
 .container-logo img {
     margin: 0px;
@@ -38,15 +47,6 @@
 .container-logo {
     width: fit-content;
     padding: 0px;
-}
-
-.container-input {
-    padding: 5%;
-    margin: 0px;
-}
-
-.container-input input {
-    width: 100%;
 }
 
 

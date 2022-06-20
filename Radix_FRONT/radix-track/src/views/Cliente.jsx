@@ -12,20 +12,13 @@ export default function Home() {
                     <form action="" className="form-group">
                         <div className="row">
                             <div className="col-4 container-input">
-                                <label htmlFor="">input</label>
+                                <label htmlFor="">Nome</label>
                                 <input type="text" className="form-group" />
-                                <label htmlFor="">input</label>
-                                <input type="text" className="form-group" />
-                                <label htmlFor="">input</label>
-                                <input type="text" className="form-group" />
-                                <label htmlFor="">input</label>
+                                <label htmlFor="">CPF/CNPJ</label>
                                 <input type="text" className="form-group" />
                             </div>
                             <div className="col-4 container-input">
-                                <label htmlFor="">input</label>
-                                <input type="text" className="form-group" />
-                                <label htmlFor="">input</label>
-                                <input type="text" className="form-group" />
+
                             </div>
                             <div className="col-4">
                                 <div className="container-logo justify-content-center">

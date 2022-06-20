@@ -32,31 +32,37 @@ export default function Relatorio() {
                     <form action="" className="form-group">
                         <div className="row">
                             <div className="col-6">
-                                <table className="table table-striped">
-                                    <thead>
-                                        <th>Data</th>
-                                        <th>Hora</th>
-                                        <th>Latitude</th>
-                                        <th>Longitude</th>
-                                    </thead>
-                                    <tbody>
-                                        {trackInfo.map((i) => {
-                                            return (
-                                                <tr>
-                                                    <td>{i.data}</td>
-                                                    <td>{i.hora}</td>
-                                                    <td>{i.latitude}</td>
-                                                    <td>{i.longitude}</td>
-                                                </tr>
-                                            )
-                                        })}
+                                <div className="container-fluid container-table">
+                                    <table className="table table-striped">
+                                        <thead>
+                                            <th>Data</th>
+                                            <th>Hora</th>
+                                            <th>Latitude</th>
+                                            <th>Longitude</th>
+                                            <th>Placa</th>
+                                            <th>Rastreador</th>
+                                        </thead>
+                                        <tbody>
+                                            {trackInfo.map((i) => {
+                                                return (
+                                                    <tr>
+                                                        <td>{i.data}</td>
+                                                        <td>{i.hora}</td>
+                                                        <td>{i.latitude}</td>
+                                                        <td>{i.longitude}</td>
+                                                        <td>{i.placa}</td>
+                                                        <td>{i.rastreador}</td>
+                                                    </tr>
+                                                )
+                                            })}
 
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div className="col-6">
                                 <div className="container-fluid container-map">
-                                    <MapContainer center={[-12.245056, -38.9458136]} zoom={13}>
+                                    <MapContainer center={[-12.245056, -38.9458136]} zoom={15}>
                                         <TileLayer
                                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -65,12 +71,28 @@ export default function Relatorio() {
                                             return (
                                                 <Marker position={[i.latitude, i.longitude]}>
                                                     <Popup>
-                                                        <div>
-                                                            <span>
-                                                                Ultima comunicação: {i.hora}
-                                                                <br />
-                                                                Velocidade: {i.velocidade}
-                                                            </span>
+                                                        <div class="card popup-card">
+                                                            <div class="card-header">
+                                                                {i.placa} - {i.rastreador}
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <table className="table table-striped">
+                                                                    <thead>
+                                                                        <th>Velocidade</th>
+                                                                        <th>Ult. comunicação</th>
+                                                                        <th>GPS status</th>
+                                                                        <th>Ignição</th>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>{i.velocidade}Km/h</td>
+                                                                            <td>{i.hora} {i.data}</td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
                                                         </div>
                                                     </Popup>
                                                 </Marker>
