@@ -12,6 +12,14 @@
     background: -moz-linear-gradient(to bottom, #fff, #000);
     background: linear-gradient(to bottom, #fff, #000);
 }
+.container-input button{
+    border: none;
+    background-color: transparent;
+    text-decoration: underline;
+    color: blue;
+    font-size: 12px;
+}
+
 .container-rastreador {
     top: 20vh;
     width: 80vw;

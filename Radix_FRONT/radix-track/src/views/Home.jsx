@@ -28,7 +28,14 @@ export default function Home() {
     }, [])
 
     if (isLoading) {
-        return (<p>Loading...</p>)
+        return (
+            <div>
+                <span>Loading...  </span>
+                <div className="spinner-border text-dark" role="status">
+                    <span className="sr-only"></span>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -87,11 +94,11 @@ export default function Home() {
                                 />
                                 <Marker position={[trackInfo.latitude, trackInfo.longitude]}>
                                     <Popup>
-                                        <div class="card popup-card">
-                                            <div class="card-header">
+                                        <div className="card popup-card">
+                                            <div className="card-header">
                                                 {trackInfo.placa} - {trackInfo.rastreador}
                                             </div>
-                                            <div class="card-body">
+                                            <div className="card-body">
                                                 <table className="table table-striped">
                                                     <thead>
                                                         <th>Velocidade</th>

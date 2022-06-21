@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Switch , Route} from 'react-router-dom'
 import Home from './Home'
 import Veiculos from './Veiculo'
@@ -11,19 +11,19 @@ export default function App(){
     return (
         <Router>
             <Switch>
-                <Route path="/cliente">
+                <Route path="/cliente" exact>
                     <Cliente />
                 </Route>
-                <Route path="/veiculos">
+                <Route path="/veiculos" exact>
                     <Veiculos />
                 </Route>
-                <Route path="/rastreadores">
+                <Route path="/rastreadores" exact>
                     <Rastreador />
                 </Route>
-                <Route path="/relatorios">
+                <Route path="/relatorios" exact>
                     <Relatorios />
                 </Route>
-                <Route path="/">
+                <Route path="/" exact>
                     <Home />
                 </Route>
             </Switch>

@@ -21,7 +21,14 @@ export default function Relatorio() {
     }, [])
 
     if (isLoading) {
-        return (<p>Loading...</p>)
+        return (
+            <div>
+                <span>Loading...  </span>
+                <div class="spinner-border text-dark" role="status">
+                    <span class="sr-only"></span>
+                </div>
+            </div>
+        )
     }
 
     return (

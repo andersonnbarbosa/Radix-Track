@@ -4,6 +4,7 @@ import './styles/Cliente.css'
 import cliente from '../assets/cliente.png'
 
 export default function Home() {
+
     return (
         <div className="container-fluid main">
             <div className="container">

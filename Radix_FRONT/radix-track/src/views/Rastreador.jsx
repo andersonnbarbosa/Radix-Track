@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './styles/Rastreador.css'
 import rastreador from '../assets/rastreadores.png'
+import Chip from '../components/Chip'
 
 export default function Rastreador() {
+
+    const [viewChip, setViewchip] = useState(false)
+
+    const handleView = () => {
+        if (viewChip) {
+            setViewchip(false)
+        } else {
+            setViewchip(true)
+        }
+    }
+
     return (
         <div className="container-fluid main">
             <div className="container">
@@ -17,10 +29,15 @@ export default function Rastreador() {
                                 <label htmlFor="">ID</label>
                                 <input type="text" className="form-group" />
                                 <label htmlFor="">CHIP</label>
-                                <input type="text" className="form-group" />
+                                <div className="container-flex">
+                                    <input type="text" className="form-group" />
+                                    {viewChip ? <></> :
+                                        <button type="button" onClick={handleView} aria-pressed="false">Cadastrar Chip</button>
+                                    }
+                                </div>
                             </div>
                             <div className="col-4 container-input">
-
+                                {viewChip ? <Chip viewChip={setViewchip} /> : <></>}
                             </div>
                             <div className="col-4">
                                 <div className="container-logo justify-content-center">

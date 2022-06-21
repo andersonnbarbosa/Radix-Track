@@ -6,6 +6,8 @@ const axios = require('axios')
 app.use(cors())
 app.use(express.json())
 
+var key = {"key" : "vSgKMxLl9x2g"}
+
 app.get('/statusRastreador', async(req,res) => {
     try{
 
@@ -40,12 +42,49 @@ app.get('/ultimosEventos', async(req,res) => {
 
 app.post('/novoVeiculo', async(req,res) => {
 
-    key =  {"key" : "vSgKMxLl9x2g"}
     info = Object.assign(key, req.body)
     try{
 
         const {data} = await axios.post('http://radix-track.herokuapp.com/novoVeiculo',info)
 
+    }catch (error){
+        console.error(error)
+    }
+    res.status(200).send()
+})
+
+app.post('/novoRastreador', async(req,res) => {
+
+    info = Object.assign(key,req.body)
+
+    try{
+
+        const {data} = await axios.post('http://radix-track.herokuapp.com/novoRastreador', info)
+    } catch (error){
+        console.error(error)
+    }
+    res.status(200).send()
+})
+
+app.post('/novoChip', async(req,res) => { 
+    
+    info = Object.assign(key, req.body)
+
+    try{
+        const {data} = await axios.post('http://radix-track.herokuapp.com/novoChip', info)
+    }catch (error){
+        console.error(error)
+    }
+    console.log(req.body)
+    res.status(200).send()
+})
+
+app.post('/novoCliente', async(req, res) => {
+
+    info = Object.assign(key,req.body)
+
+    try{
+        const {data} = await axios.post('http://radix-track.herokuapp.com/novoCliente', info)
     }catch (error){
         console.error(error)
     }
