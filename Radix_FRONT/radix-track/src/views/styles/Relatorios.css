@@ -53,3 +53,23 @@
 .container-button button {
     margin: 15px;
 }
+
+.container-top{
+    display:none;
+}
+
+.container-top input{
+    width: 150px;
+    height:35px;
+    margin-bottom: 5px;
+    padding:0;
+    background:transparent;
+    border-radius: 5px;
+
+}
+
+.container-top .btn{
+    width:100px;
+    background: black;
+    margin-left: 5px;
+}

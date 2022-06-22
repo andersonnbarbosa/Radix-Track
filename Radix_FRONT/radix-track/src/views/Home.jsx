@@ -8,6 +8,8 @@ import rastreadores from '../assets/rastreadores.png'
 import veiculos from '../assets/veiculos.png'
 import cliente from '../assets/cliente.png'
 import filtro from '../assets/filtro.png'
+import ligado from '../assets/ligado.png'
+import desligado from '../assets/desligado.png'
 
 export default function Home() {
 
@@ -16,12 +18,18 @@ export default function Home() {
 
     function queryData() {
         setLoading(true)
-        fetch('http://localhost:3001/statusRastreador')
-            .then(response => response.json())
-            .then(data => {
-                setTrackinfo(data);
-                setLoading(false)
-            });
+        try {
+            fetch('http://localhost:3001/statusRastreador')
+                .then(response => response.json())
+                .then(data => {
+                    setTrackinfo(data);
+                    setLoading(false)
+                });
+        } catch (error) {
+            setLoading(false)
+            console.error(error)
+        }
+
     }
     useEffect(() => {
         queryData();
@@ -30,7 +38,7 @@ export default function Home() {
     if (isLoading) {
         return (
             <div>
-                <span>Loading...  </span>
+                <span>        Loading...  </span>
                 <div className="spinner-border text-dark" role="status">
                     <span className="sr-only"></span>
                 </div>
@@ -52,9 +60,9 @@ export default function Home() {
                 </div>
                 <div className="col-3">
                     <div className="container-opcoes">
-                        <span className="logo-relatorios">
-                            <Link to="/relatorios">
-                                <img src={relatorios} alt="Relatorios" />
+                        <span className="logo-cliente">
+                            <Link to="/cliente">
+                                <img src={cliente} alt="Cliente" />
                             </Link>
                         </span>
                         <span className="logo-rastreadores">
@@ -67,12 +75,11 @@ export default function Home() {
                                 <img src={veiculos} alt="Veiculos" />
                             </Link>
                         </span>
-                        <span className="logo-cliente">
-                            <Link to="/cliente">
-                                <img src={cliente} alt="Cliente" />
+                        <span className="logo-relatorios">
+                            <Link to="/relatorios">
+                                <img src={relatorios} alt="Relatorios" />
                             </Link>
                         </span>
-
                     </div>
                 </div>
                 <div className="col-1">
@@ -110,8 +117,8 @@ export default function Home() {
                                                         <tr>
                                                             <td>{trackInfo.velocidade}Km</td>
                                                             <td>{trackInfo.hora} {trackInfo.data}</td>
-                                                            <td></td>
-                                                            <td></td>
+                                                            <td>{!trackInfo.gps_status ? <img alt="Icon" src={ligado} /> : <img alt="Icon" src={desligado} />}</td>
+                                                            <td>{!trackInfo.ignicao ? <img alt="Icon" src={ligado} /> : <img alt="Icon" src={desligado} />}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>

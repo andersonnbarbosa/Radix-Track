@@ -2,10 +2,20 @@ import React, { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 import './styles/Relatorios.css'
+import desligado from '../assets/desligado.png'
+import ligado from '../assets/ligado.png'
 
 export default function Relatorio() {
     const [trackInfo, setTrackinfo] = useState([]);
     const [isLoading, setLoading] = useState(true);
+    const [periodo, setPeriodo] = useState({})
+
+    const handleChange = (event) => {
+        const name = event.target.name;
+        const value = event.target.value
+
+        setPeriodo(values => ({ ...values, [name]: value }))
+    }
 
     function queryData() {
         setLoading(true)
@@ -35,7 +45,14 @@ export default function Relatorio() {
         <div className="container-fluid main">
             <div className="container">
                 <div className="container-relatorio">
-                    <h1>Relatorios</h1>
+                    <div className="container-flex">
+                        <h1>Relatorios</h1>
+                        <form onSubmit={queryData} className="form-group container-top">
+                            <input type="datetime-local" name="inicio" value={periodo.inicio} onChange={handleChange} className="form-group" />
+                            <input type="datetime-local" name="final" value={periodo.final} onChange={handleChange} className="form-group" />
+                            <input type="submit" value={"Pesquisar"} className="btn btn-dark" />
+                        </form>
+                    </div>
                     <form action="" className="form-group">
                         <div className="row">
                             <div className="col-6">
@@ -94,8 +111,8 @@ export default function Relatorio() {
                                                                         <tr>
                                                                             <td>{i.velocidade}Km/h</td>
                                                                             <td>{i.hora} {i.data}</td>
-                                                                            <td></td>
-                                                                            <td></td>
+                                                                            <td>{!i.gps_status ? <img alt="Icon" src={ligado} /> : <img alt="Icon" src={desligado} />}</td>
+                                                                            <td>{!i.ignicao ? <img alt="Icon" src={ligado} /> : <img alt="Icon" src={desligado} />}</td>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>

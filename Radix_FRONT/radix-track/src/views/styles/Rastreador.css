@@ -20,6 +20,7 @@
     font-size: 12px;
 }
 
+
 .container-rastreador {
     top: 20vh;
     width: 80vw;
@@ -48,10 +49,22 @@
     margin: 0px;
 }
 
+.container-input select {
+    background:transparent;
+    border-radius: 5px;
+    border-top-width:2px;
+    border-left-width:2px;
+    border-color: gray;
+    font-size: 10px;
+}
+
 .container-input input {
     width: 100%;
 }
 
+.container-button input {
+    width: 90px;
+}
 
 .container-button button {
     margin: 10px;
